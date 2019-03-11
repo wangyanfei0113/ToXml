@@ -1,5 +1,5 @@
 <?php
-
+namespace Math;
 /**
  * Pure-PHP arbitrary precision integer arithmetic library.
  *
@@ -33,8 +33,8 @@
  * <?php
  *    include 'Math/BigInteger.php';
  *
- *    $a = new Math_BigInteger(2);
- *    $b = new Math_BigInteger(3);
+ *    $a = new BigInteger(2);
+ *    $b = new BigInteger(3);
  *
  *    $c = $a->add($b);
  *
@@ -61,11 +61,11 @@
  * THE SOFTWARE.
  *
  * @category  Math
- * @package   Math_BigInteger
+ * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2006 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @link      http://pear.php.net/package/Math_BigInteger
+ * @link      http://pear.php.net/package/BigInteger
  */
 
 /**#@+
@@ -136,7 +136,7 @@ define('MATH_BIGINTEGER_DATA', 1);
  * Mode constants.
  *
  * @access private
- * @see Math_BigInteger::Math_BigInteger()
+ * @see BigInteger::BigInteger()
  */
 /**
  * To use the pure-PHP implementation
@@ -169,7 +169,7 @@ define('MATH_BIGINTEGER_KARATSUBA_CUTOFF', 25);
  * Pure-PHP arbitrary precision integer arithmetic library. Supports base-2, base-10, base-16, and base-256
  * numbers.
  *
- * @package Math_BigInteger
+ * @package BigInteger
  * @author  Jim Wigginton <terrafrost@php.net>
  * @access  public
  */
@@ -240,7 +240,7 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('0x32', 16); // 50 in base-16
+     *    $a = new BigInteger('0x32', 16); // 50 in base-16
      *
      *    echo $a->toString(); // outputs 50
      * ?>
@@ -248,7 +248,7 @@ class BigInteger
      *
      * @param optional $x base-10 number or base-$base number if $base set.
      * @param optional integer $base
-     * @return Math_BigInteger
+     * @return BigInteger
      * @access public
      */
     public function __construct($x = 0, $base = 10)
@@ -397,7 +397,7 @@ class BigInteger
                     if (MATH_BIGINTEGER_MODE != MATH_BIGINTEGER_MODE_INTERNAL) {
                         $this->is_negative = false;
                     }
-                    $temp = $this->add(new Math_BigInteger('-1'));
+                    $temp = $this->add(new BigInteger('-1'));
                     $this->value = $temp->value;
                 }
                 break;
@@ -424,18 +424,18 @@ class BigInteger
                         break;
                     case MATH_BIGINTEGER_MODE_BCMATH:
                         $x = ( strlen($x) & 1 ) ? '0' . $x : $x;
-                        $temp = new Math_BigInteger(pack('H*', $x), 256);
+                        $temp = new BigInteger(pack('H*', $x), 256);
                         $this->value = $this->is_negative ? '-' . $temp->value : $temp->value;
                         $this->is_negative = false;
                         break;
                     default:
                         $x = ( strlen($x) & 1 ) ? '0' . $x : $x;
-                        $temp = new Math_BigInteger(pack('H*', $x), 256);
+                        $temp = new BigInteger(pack('H*', $x), 256);
                         $this->value = $temp->value;
                 }
 
                 if ($is_negative) {
-                    $temp = $this->add(new Math_BigInteger('-1'));
+                    $temp = $this->add(new BigInteger('-1'));
                     $this->value = $temp->value;
                 }
                 break;
@@ -456,9 +456,9 @@ class BigInteger
                         $this->value = $x === '-' ? '0' : (string) $x;
                         break;
                     default:
-                        $temp = new Math_BigInteger();
+                        $temp = new BigInteger();
 
-                        $multiplier = new Math_BigInteger();
+                        $multiplier = new BigInteger();
                         $multiplier->value = array(MATH_BIGINTEGER_MAX10);
 
                         if ($x[0] == '-') {
@@ -469,7 +469,7 @@ class BigInteger
                         $x = str_pad($x, strlen($x) + ((MATH_BIGINTEGER_MAX10_LEN - 1) * strlen($x)) % MATH_BIGINTEGER_MAX10_LEN, 0, STR_PAD_LEFT);
                         while (strlen($x)) {
                             $temp = $temp->multiply($multiplier);
-                            $temp = $temp->add(new Math_BigInteger($this->_int2bytes(substr($x, 0, MATH_BIGINTEGER_MAX10_LEN)), 256));
+                            $temp = $temp->add(new BigInteger($this->_int2bytes(substr($x, 0, MATH_BIGINTEGER_MAX10_LEN)), 256));
                             $x = substr($x, MATH_BIGINTEGER_MAX10_LEN);
                         }
 
@@ -497,7 +497,7 @@ class BigInteger
                     $str = '-' . $str;
                 }
 
-                $temp = new Math_BigInteger($str, 8 * $base); // ie. either -16 or +16
+                $temp = new BigInteger($str, 8 * $base); // ie. either -16 or +16
                 $this->value = $temp->value;
                 $this->is_negative = $temp->is_negative;
 
@@ -532,12 +532,12 @@ class BigInteger
     function toBytes($twos_compliment = false)
     {
         if ($twos_compliment) {
-            $comparison = $this->compare(new Math_BigInteger());
+            $comparison = $this->compare(new BigInteger());
             if ($comparison == 0) {
                 return $this->precision > 0 ? str_repeat(chr(0), ($this->precision + 1) >> 3) : '';
             }
 
-            $temp = $comparison < 0 ? $this->add(new Math_BigInteger(1)) : $this->copy();
+            $temp = $comparison < 0 ? $this->add(new BigInteger(1)) : $this->copy();
             $bytes = $temp->toBytes();
 
             if (empty($bytes)) { // eg. if the number we're trying to convert is -1
@@ -615,7 +615,7 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('65');
+     *    $a = new BigInteger('65');
      *
      *    echo $a->toHex(); // outputs '41'
      * ?>
@@ -642,7 +642,7 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('65');
+     *    $a = new BigInteger('65');
      *
      *    echo $a->toBits(); // outputs '1000001'
      * ?>
@@ -665,7 +665,7 @@ class BigInteger
         }
         $result = $this->precision > 0 ? substr($bits, -$this->precision) : ltrim($bits, '0');
 
-        if ($twos_compliment && $this->compare(new Math_BigInteger()) > 0 && $this->precision <= 0) {
+        if ($twos_compliment && $this->compare(new BigInteger()) > 0 && $this->precision <= 0) {
             return '0' . $result;
         }
 
@@ -680,7 +680,7 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('50');
+     *    $a = new BigInteger('50');
      *
      *    echo $a->toString(); // outputs 50
      * ?>
@@ -710,7 +710,7 @@ class BigInteger
         $temp = $this->copy();
         $temp->is_negative = false;
 
-        $divisor = new Math_BigInteger();
+        $divisor = new BigInteger();
         $divisor->value = array(MATH_BIGINTEGER_MAX10);
         $result = '';
         while (count($temp->value)) {
@@ -743,7 +743,7 @@ class BigInteger
      */
     function copy()
     {
-        $temp = new Math_BigInteger();
+        $temp = new BigInteger();
         $temp->value = $this->value;
         $temp->is_negative = $this->is_negative;
         $temp->generator = $this->generator;
@@ -769,14 +769,14 @@ class BigInteger
     /**
      * __clone() magic method
      *
-     * Although you can call Math_BigInteger::__toString() directly in PHP5, you cannot call Math_BigInteger::__clone()
+     * Although you can call BigInteger::__toString() directly in PHP5, you cannot call BigInteger::__clone()
      * directly in PHP5.  You can in PHP4 since it's not a magic method, but in PHP5, you have to call it by using the PHP5
      * only syntax of $y = clone $x.  As such, if you're trying to write an application that works on both PHP4 and PHP5,
-     * call Math_BigInteger::copy(), instead.
+     * call BigInteger::copy(), instead.
      *
      * @access public
      * @see copy()
-     * @return Math_BigInteger
+     * @return BigInteger
      */
     function __clone()
     {
@@ -786,7 +786,7 @@ class BigInteger
     /**
      *  __sleep() magic method
      *
-     * Will be called, automatically, when serialize() is called on a Math_BigInteger object.
+     * Will be called, automatically, when serialize() is called on a BigInteger object.
      *
      * @see __wakeup()
      * @access public
@@ -808,14 +808,14 @@ class BigInteger
     /**
      *  __wakeup() magic method
      *
-     * Will be called, automatically, when unserialize() is called on a Math_BigInteger object.
+     * Will be called, automatically, when unserialize() is called on a BigInteger object.
      *
      * @see __sleep()
      * @access public
      */
     function __wakeup()
     {
-        $temp = new Math_BigInteger($this->hex, -16);
+        $temp = new BigInteger($this->hex, -16);
         $this->value = $temp->value;
         $this->is_negative = $temp->is_negative;
         $this->setRandomGenerator($this->generator);
@@ -833,8 +833,8 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('10');
-     *    $b = new Math_BigInteger('20');
+     *    $a = new BigInteger('10');
+     *    $b = new BigInteger('20');
      *
      *    $c = $a->add($b);
      *
@@ -842,8 +842,8 @@ class BigInteger
      * ?>
      * </code>
      *
-     * @param Math_BigInteger $y
-     * @return Math_BigInteger
+     * @param BigInteger $y
+     * @return BigInteger
      * @access public
      * @internal Performs base-2**52 addition
      */
@@ -851,12 +851,12 @@ class BigInteger
     {
         switch ( MATH_BIGINTEGER_MODE ) {
             case MATH_BIGINTEGER_MODE_GMP:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = gmp_add($this->value, $y->value);
 
                 return $this->_normalize($temp);
             case MATH_BIGINTEGER_MODE_BCMATH:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = bcadd($this->value, $y->value, 0);
 
                 return $this->_normalize($temp);
@@ -864,7 +864,7 @@ class BigInteger
 
         $temp = $this->_add($this->value, $this->is_negative, $y->value, $y->is_negative);
 
-        $result = new Math_BigInteger();
+        $result = new BigInteger();
         $result->value = $temp[MATH_BIGINTEGER_VALUE];
         $result->is_negative = $temp[MATH_BIGINTEGER_SIGN];
 
@@ -964,8 +964,8 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('10');
-     *    $b = new Math_BigInteger('20');
+     *    $a = new BigInteger('10');
+     *    $b = new BigInteger('20');
      *
      *    $c = $a->subtract($b);
      *
@@ -973,8 +973,8 @@ class BigInteger
      * ?>
      * </code>
      *
-     * @param Math_BigInteger $y
-     * @return Math_BigInteger
+     * @param BigInteger $y
+     * @return BigInteger
      * @access public
      * @internal Performs base-2**52 subtraction
      */
@@ -982,12 +982,12 @@ class BigInteger
     {
         switch ( MATH_BIGINTEGER_MODE ) {
             case MATH_BIGINTEGER_MODE_GMP:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = gmp_sub($this->value, $y->value);
 
                 return $this->_normalize($temp);
             case MATH_BIGINTEGER_MODE_BCMATH:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = bcsub($this->value, $y->value, 0);
 
                 return $this->_normalize($temp);
@@ -995,7 +995,7 @@ class BigInteger
 
         $temp = $this->_subtract($this->value, $this->is_negative, $y->value, $y->is_negative);
 
-        $result = new Math_BigInteger();
+        $result = new BigInteger();
         $result->value = $temp[MATH_BIGINTEGER_VALUE];
         $result->is_negative = $temp[MATH_BIGINTEGER_SIGN];
 
@@ -1100,8 +1100,8 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('10');
-     *    $b = new Math_BigInteger('20');
+     *    $a = new BigInteger('10');
+     *    $b = new BigInteger('20');
      *
      *    $c = $a->multiply($b);
      *
@@ -1109,20 +1109,20 @@ class BigInteger
      * ?>
      * </code>
      *
-     * @param Math_BigInteger $x
-     * @return Math_BigInteger
+     * @param BigInteger $x
+     * @return BigInteger
      * @access public
      */
     function multiply($x)
     {
         switch ( MATH_BIGINTEGER_MODE ) {
             case MATH_BIGINTEGER_MODE_GMP:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = gmp_mul($this->value, $x->value);
 
                 return $this->_normalize($temp);
             case MATH_BIGINTEGER_MODE_BCMATH:
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = bcmul($this->value, $x->value, 0);
 
                 return $this->_normalize($temp);
@@ -1130,7 +1130,7 @@ class BigInteger
 
         $temp = $this->_multiply($this->value, $this->is_negative, $x->value, $x->is_negative);
 
-        $product = new Math_BigInteger();
+        $product = new BigInteger();
         $product->value = $temp[MATH_BIGINTEGER_VALUE];
         $product->is_negative = $temp[MATH_BIGINTEGER_SIGN];
 
@@ -1384,8 +1384,8 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('10');
-     *    $b = new Math_BigInteger('20');
+     *    $a = new BigInteger('10');
+     *    $b = new BigInteger('20');
      *
      *    list($quotient, $remainder) = $a->divide($b);
      *
@@ -1404,8 +1404,8 @@ class BigInteger
     {
         switch ( MATH_BIGINTEGER_MODE ) {
             case MATH_BIGINTEGER_MODE_GMP:
-                $quotient = new Math_BigInteger();
-                $remainder = new Math_BigInteger();
+                $quotient = new BigInteger();
+                $remainder = new BigInteger();
 
                 list($quotient->value, $remainder->value) = gmp_div_qr($this->value, $y->value);
 
@@ -1415,8 +1415,8 @@ class BigInteger
 
                 return array($this->_normalize($quotient), $this->_normalize($remainder));
             case MATH_BIGINTEGER_MODE_BCMATH:
-                $quotient = new Math_BigInteger();
-                $remainder = new Math_BigInteger();
+                $quotient = new BigInteger();
+                $remainder = new BigInteger();
 
                 $quotient->value = bcdiv($this->value, $y->value, 0);
                 $remainder->value = bcmod($this->value, $y->value);
@@ -1430,8 +1430,8 @@ class BigInteger
 
         if (count($y->value) == 1) {
             list($q, $r) = $this->_divide_digit($this->value, $y->value[0]);
-            $quotient = new Math_BigInteger();
-            $remainder = new Math_BigInteger();
+            $quotient = new BigInteger();
+            $remainder = new BigInteger();
             $quotient->value = $q;
             $remainder->value = array($r);
             $quotient->is_negative = $this->is_negative != $y->is_negative;
@@ -1440,7 +1440,7 @@ class BigInteger
 
         static $zero;
         if ( !isset($zero) ) {
-            $zero = new Math_BigInteger();
+            $zero = new BigInteger();
         }
 
         $x = $this->copy();
@@ -1454,10 +1454,10 @@ class BigInteger
         $diff = $x->compare($y);
 
         if ( !$diff ) {
-            $temp = new Math_BigInteger();
+            $temp = new BigInteger();
             $temp->value = array(1);
             $temp->is_negative = $x_sign != $y_sign;
-            return array($this->_normalize($temp), $this->_normalize(new Math_BigInteger()));
+            return array($this->_normalize($temp), $this->_normalize(new BigInteger()));
         }
 
         if ( $diff < 0 ) {
@@ -1465,7 +1465,7 @@ class BigInteger
             if ( $x_sign ) {
                 $x = $y->subtract($x);
             }
-            return array($this->_normalize(new Math_BigInteger()), $this->_normalize($x));
+            return array($this->_normalize(new BigInteger()), $this->_normalize($x));
         }
 
         // normalize $x and $y as described in HAC 14.23 / 14.24
@@ -1480,15 +1480,15 @@ class BigInteger
         $x_max = count($x->value) - 1;
         $y_max = count($y->value) - 1;
 
-        $quotient = new Math_BigInteger();
+        $quotient = new BigInteger();
         $quotient_value = &$quotient->value;
         $quotient_value = $this->_array_repeat(0, $x_max - $y_max + 1);
 
         static $temp, $lhs, $rhs;
         if (!isset($temp)) {
-            $temp = new Math_BigInteger();
-            $lhs =  new Math_BigInteger();
-            $rhs =  new Math_BigInteger();
+            $temp = new BigInteger();
+            $lhs =  new BigInteger();
+            $rhs =  new BigInteger();
         }
         $temp_value = &$temp->value;
         $rhs_value =  &$rhs->value;
@@ -1603,9 +1603,9 @@ class BigInteger
      * <?php
      *    include 'Math/BigInteger.php';
      *
-     *    $a = new Math_BigInteger('10');
-     *    $b = new Math_BigInteger('20');
-     *    $c = new Math_BigInteger('30');
+     *    $a = new BigInteger('10');
+     *    $b = new BigInteger('20');
+     *    $c = new BigInteger('30');
      *
      *    $c = $a->modPow($b, $c);
      *
@@ -1613,9 +1613,9 @@ class BigInteger
      * ?>
      * </code>
      *
-     * @param Math_BigInteger $e
-     * @param Math_BigInteger $n
-     * @return Math_BigInteger
+     * @param BigInteger $e
+     * @param BigInteger $n
+     * @return BigInteger
      * @access public
      * @internal The most naive approach to modular exponentiation has very unreasonable requirements, and
      *    and although the approach involving repeated squaring does vastly better, it, too, is impractical
@@ -1641,7 +1641,7 @@ class BigInteger
     {
         $n = $this->bitmask !== false && $this->bitmask->compare($n) < 0 ? $this->bitmask : $n->abs();
 
-        if ($e->compare(new Math_BigInteger()) < 0) {
+        if ($e->compare(new BigInteger()) < 0) {
             $e = $e->abs();
 
             $temp = $this->modInverse($n);
@@ -1653,13 +1653,13 @@ class BigInteger
         }
 
         if ( MATH_BIGINTEGER_MODE == MATH_BIGINTEGER_MODE_GMP ) {
-            $temp = new Math_BigInteger();
+            $temp = new BigInteger();
             $temp->value = gmp_powm($this->value, $e->value, $n->value);
 
             return $this->_normalize($temp);
         }
 
-        if ($this->compare(new Math_BigInteger()) < 0 || $this->compare($n) > 0) {
+        if ($this->compare(new BigInteger()) < 0 || $this->compare($n) > 0) {
             list(, $temp) = $this->divide($n);
             return $temp->modPow($e, $n);
         }
@@ -1695,19 +1695,19 @@ class BigInteger
             $plaintext = str_pad($this->toBytes(), strlen($n->toBytes(true)) - 1, "\0", STR_PAD_LEFT);
 
             if (openssl_public_encrypt($plaintext, $result, $RSAPublicKey, OPENSSL_NO_PADDING)) {
-                return new Math_BigInteger($result, 256);
+                return new BigInteger($result, 256);
             }
         }
 
         if ( MATH_BIGINTEGER_MODE == MATH_BIGINTEGER_MODE_BCMATH ) {
-                $temp = new Math_BigInteger();
+                $temp = new BigInteger();
                 $temp->value = bcpowmod($this->value, $e->value, $n->value, 0);
 
                 return $this->_normalize($temp);
         }
 
         if ( empty($e->value) ) {
-            $temp = new Math_BigInteger();
+            $temp = new BigInteger();
             $temp->value = array(1);
             return $this->_normalize($temp);
         }
@@ -1718,7 +1718,7 @@ class BigInteger
         }
 
         if ( $e->value == array(2) ) {
-            $temp = new Math_BigInteger();
+            $temp = new BigInteger();
             $temp->value = $this->_square($this->value);
             list(, $temp) = $temp->divide($n);
             return $this->_normalize($temp);
@@ -1750,7 +1750,7 @@ class BigInteger
 
         $mod1 = $n->copy();
         $mod1->_rshift($j);
-        $mod2 = new Math_BigInteger();
+        $mod2 = new BigInteger();
         $mod2->value = array(1);
         $mod2->_lshift($j);
 
@@ -3104,11 +3104,11 @@ class BigInteger
      * $min->random($max)
      * $max->random($min)
      *
-     * @param Math_BigInteger $arg1
-     * @param optional Math_BigInteger $arg2
-     * @return Math_BigInteger
+     * @param BigInteger $arg1
+     * @param optional BigInteger $arg2
+     * @return BigInteger
      * @access public
-     * @internal The API for creating random numbers used to be $a->random($min, $max), where $a was a Math_BigInteger object.
+     * @internal The API for creating random numbers used to be $a->random($min, $max), where $a was a BigInteger object.
      *           That method is still supported for BC purposes.
      */
     function random($arg1, $arg2 = false)
@@ -3124,7 +3124,6 @@ class BigInteger
             $min = $arg1;
             $max = $arg2;
         }
-
         $compare = $max->compare($min);
 
         if (!$compare) {
@@ -3138,7 +3137,7 @@ class BigInteger
 
         static $one;
         if (!isset($one)) {
-            $one = new Math_BigInteger(1);
+            $one = new BigInteger(1);
         }
 
         $max = $max->subtract($min->subtract($one));
@@ -3159,7 +3158,7 @@ class BigInteger
 
             http://crypto.stackexchange.com/questions/5708/creating-a-small-number-from-a-cryptographically-secure-random-string
         */
-        $random_max = new Math_BigInteger(chr(1) . str_repeat("\0", $size), 256);
+        $random_max = new BigInteger(chr(1) . str_repeat("\0", $size), 256);
         $random = $this->_random_number_helper($size);
 
         list($max_multiple) = $random_max->divide($max);
@@ -3185,8 +3184,8 @@ class BigInteger
      * If there's not a prime within the given range, false will be returned.  If more than $timeout seconds have elapsed,
      * give up and return false.
      *
-     * @param Math_BigInteger $arg1
-     * @param optional Math_BigInteger $arg2
+     * @param BigInteger $arg1
+     * @param optional BigInteger $arg2
      * @param optional Integer $timeout
      * @return Mixed
      * @access public
@@ -3219,8 +3218,8 @@ class BigInteger
 
         static $one, $two;
         if (!isset($one)) {
-            $one = new Math_BigInteger(1);
-            $two = new Math_BigInteger(2);
+            $one = new BigInteger(1);
+            $two = new BigInteger(2);
         }
 
         $start = time();
@@ -3229,7 +3228,7 @@ class BigInteger
 
         // gmp_nextprime() requires PHP 5 >= 5.2.0 per <http://php.net/gmp-nextprime>.
         if ( MATH_BIGINTEGER_MODE == MATH_BIGINTEGER_MODE_GMP && function_exists('gmp_nextprime') ) {
-            $p = new Math_BigInteger();
+            $p = new BigInteger();
             $p->value = gmp_nextprime($x->value);
 
             if ($p->compare($max) <= 0) {
@@ -3312,10 +3311,10 @@ class BigInteger
      * Checks a numer to see if it's prime
      *
      * Assuming the $t parameter is not set, this function has an error rate of 2**-80.  The main motivation for the
-     * $t parameter is distributability.  Math_BigInteger::randomPrime() can be distributed across multiple pageloads
+     * $t parameter is distributability.  BigInteger::randomPrime() can be distributed across multiple pageloads
      * on a website instead of just one.
      *
-     * @param optional Math_BigInteger $t
+     * @param optional BigInteger $t
      * @return Boolean
      * @access public
      * @internal Uses the
@@ -3385,13 +3384,13 @@ class BigInteger
 
             if ( MATH_BIGINTEGER_MODE != MATH_BIGINTEGER_MODE_INTERNAL ) {
                 for ($i = 0; $i < count($primes); ++$i) {
-                    $primes[$i] = new Math_BigInteger($primes[$i]);
+                    $primes[$i] = new BigInteger($primes[$i]);
                 }
             }
 
-            $zero = new Math_BigInteger();
-            $one = new Math_BigInteger(1);
-            $two = new Math_BigInteger(2);
+            $zero = new BigInteger();
+            $one = new BigInteger(1);
+            $two = new BigInteger(2);
         }
 
         if ($this->equals($one)) {
@@ -3536,7 +3535,7 @@ class BigInteger
      *
      * Removes leading zeros and truncates (if necessary) to maintain the appropriate precision
      *
-     * @param Math_BigInteger
+     * @param BigInteger
      * @return Math_BigInteger
      * @see _trim()
      * @access private
