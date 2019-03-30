@@ -1,6 +1,5 @@
 <?php
 
-
 spl_autoload_register(function ($className) {
     $class_name = str_replace('\\', '/', $className);
     include_once $class_name . '.php';
